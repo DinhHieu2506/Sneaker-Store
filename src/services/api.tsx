@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "../zustand/auth";
 
 const api = axios.create({
-  baseURL: "https://api-ecommerce-shoe.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
