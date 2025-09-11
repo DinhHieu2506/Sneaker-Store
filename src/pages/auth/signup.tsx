@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useAuthStore } from "../../zustand/auth"; // import store zustand
-import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../zustand/auth";
+import { useNavigate, Link } from "react-router-dom";
+import { Toaster, toast } from "sonner";
 
 export default function Signup() {
   const { register, loading, error } = useAuthStore();
@@ -41,12 +42,11 @@ export default function Signup() {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     const success = await register({
-      id: crypto.randomUUID(),
       email: form.email,
       password: form.password,
       firstName: form.firstName,
@@ -54,13 +54,18 @@ export default function Signup() {
       phone: form.phone,
       address: form.address,
     });
+
     if (success) {
-      navigate("/");
+      toast.success("Account created successfully!");
+      navigate("/auth/login");
+    } else if (error) {
+      toast.error(error);
     }
   };
 
   return (
     <main className="min-h-screen">
+      <Toaster position="top-right" />
       <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-screen">
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-2xl">
           <div className="flex flex-col space-y-1.5 p-6 text-center">
@@ -145,7 +150,6 @@ export default function Signup() {
                 />
               </div>
 
-              {/* Password and Confirm Password */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label
@@ -279,9 +283,9 @@ export default function Signup() {
               <span className="text-muted-foreground">
                 Already have an account?{" "}
               </span>
-              <a className="text-primary hover:underline" href="/auth/login">
+              <Link className="text-primary hover:underline" to="/auth/login">
                 Sign in
-              </a>
+              </Link>
             </div>
           </div>
         </div>

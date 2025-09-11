@@ -5,21 +5,19 @@ import { useWishlistStore } from "./wishlist";
 import { useCartStore } from "./cart";
 import { useProductsStore } from "./products";
 
-type Address = {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-};
-
 export interface User {
   id: string;
   email: string;
   firstName?: string;
   lastName?: string;
   phone?: string;
-  address?: Address;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
 }
 
 type LoginResponse = {
@@ -35,17 +33,13 @@ interface AuthState {
   loading: boolean;
   error: string | null;
 
-  register: (
-    payload: Omit<User, "id"> & { password: string }
-  ) => Promise<boolean>;
+  register: (payload: Omit<User, "id"> & { password: string }) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
   checkAuth: () => Promise<boolean>;
   logout: () => void;
 }
 
-
 function normalizeUser(apiUser: any): User {
-  if (!apiUser) throw new Error("Missing user in response");
   return {
     id: apiUser.id ?? apiUser._id ?? "",
     email: apiUser.email ?? "",
@@ -62,7 +56,6 @@ function normalizeUser(apiUser: any): User {
   };
 }
 
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -72,72 +65,49 @@ export const useAuthStore = create<AuthState>()(
       loading: false,
       error: null,
 
-
+      /** Đăng ký */
       register: async (payload) => {
         try {
           set({ loading: true, error: null });
-         
-          await api.post("/auth/register", payload);
+          await api.post("/auth/signup", payload);
           set({ loading: false });
           return true;
         } catch (err: any) {
-          const msg =
-            err?.response?.data?.message ||
-            err?.message ||
-            "Registration failed";
+          const msg = err?.response?.data?.message || err?.message || "Registration failed";
           set({ error: msg, loading: false });
           return false;
         }
       },
 
+      /** Đăng nhập */
       login: async (email, password) => {
         try {
           set({ loading: true, error: null });
-          const res = await api.post<LoginResponse>("/auth/login", {
-            email,
-            password,
-          });
+          const res = await api.post<LoginResponse>("/auth/login", { email, password });
 
           const block = res.data?.data ?? res.data;
           const token = block?.token;
           const apiUser = block?.user;
-
           if (!token || !apiUser) throw new Error("Invalid login response");
 
           const user = normalizeUser(apiUser);
 
-          set({
-            user,
-            token,
-            isAuthenticated: true,
-            loading: false,
-            error: null,
-          });
+          set({ user, token, isAuthenticated: true, loading: false, error: null });
 
-
-          const { fetchWishlist } = useWishlistStore.getState();
-          const { fetchCart } = useCartStore.getState();
-          const { fetchProducts } = useProductsStore.getState();
-
-          fetchWishlist();
-          fetchCart();
-          fetchProducts();
+          // fetch global data
+          useWishlistStore.getState().fetchWishlist();
+          useCartStore.getState().fetchCart();
+          useProductsStore.getState().fetchProducts();
 
           return true;
         } catch (err: any) {
-          const msg =
-            err?.response?.data?.message || err?.message || "Login failed";
-          set({
-            error: msg,
-            loading: false,
-            user: null,
-            token: null,
-            isAuthenticated: false,
-          });
+          const msg = err?.response?.data?.message || err?.message || "Login failed";
+          set({ error: msg, loading: false, user: null, token: null, isAuthenticated: false });
           return false;
         }
       },
 
+      /** Kiểm tra phiên khi reload */
       checkAuth: async () => {
         const token = get().token;
         if (!token) {
@@ -146,46 +116,38 @@ export const useAuthStore = create<AuthState>()(
         }
         try {
           set({ loading: true, error: null });
-
           const res = await api.get("/me");
           const user = normalizeUser(res.data?.data ?? res.data);
           set({ user, isAuthenticated: true, loading: false });
+
+          // fetch global data sau reload
+          useWishlistStore.getState().fetchWishlist();
+          useCartStore.getState().fetchCart();
+          useProductsStore.getState().fetchProducts();
+
           return true;
-        } catch (err: any) {
-          set({
-            user: null,
-            token: null,
-            isAuthenticated: false,
-            loading: false,
-            error: "Session expired",
-          });
+        } catch {
+          set({ user: null, token: null, isAuthenticated: false, loading: false, error: "Session expired" });
           return false;
         }
       },
 
-
+      /** Đăng xuất */
       logout: () => {
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-          loading: false,
-          error: null,
-        });
+        set({ user: null, token: null, isAuthenticated: false, loading: false, error: null });
         useWishlistStore.getState().clearWishlist();
         useCartStore.getState().clearCart();
+        localStorage.removeItem("auth"); // clear persist
       },
     }),
     {
       name: "auth",
       storage: createJSONStorage(() => localStorage),
-
       partialize: (s) => ({
         user: s.user,
         token: s.token,
         isAuthenticated: s.isAuthenticated,
       }),
-      version: 1,
     }
   )
 );
