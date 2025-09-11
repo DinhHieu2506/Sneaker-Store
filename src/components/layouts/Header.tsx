@@ -118,7 +118,7 @@ export default function Header() {
               <ShoppingCart className="h-5 w-5" />
               {cart.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                  {cart.length}
                 </span>
               )}
               <span className="sr-only">Shopping cart</span>

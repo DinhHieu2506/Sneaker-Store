@@ -22,14 +22,12 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
 
-  // Fetch products nếu chưa có
   useEffect(() => {
     if (!products.length) {
       fetchProducts();
     }
   }, [products, fetchProducts]);
 
-  // Tìm product theo id
   useEffect(() => {
     if (id && products.length) {
       const found = products.find((p) => p.id === id);
@@ -79,7 +77,6 @@ export default function ProductDetail() {
 
   const isInWishlist = !!getWishlistItemById(product.id);
 
-  // Cập nhật số lượng
   const handleDecreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
@@ -92,7 +89,6 @@ export default function ProductDetail() {
     }
   };
 
-  // Thêm vào giỏ
   const handleAddToCart = async () => {
     if (!user) {
       toast.error("You need to login to add to cart");
@@ -108,7 +104,7 @@ export default function ProductDetail() {
     }
   };
 
-  // Toggle wishlist
+
   const handleWishlistToggle = async () => {
     if (!user) {
       toast.error("You need to login to manage wishlist");
@@ -156,7 +152,6 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Right: details */}
         <div className="space-y-6">
           <div>
             <p className="text-muted-foreground mb-2">{product.brand}</p>
@@ -167,7 +162,6 @@ export default function ProductDetail() {
             <p className="text-muted-foreground">{product.description}</p>
           </div>
 
-          {/* Color */}
           {product.colors?.length > 0 && (
             <div>
               <h3 className="font-medium mb-3">Color</h3>
@@ -194,7 +188,6 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Size */}
           {product.sizes && product.sizes.length > 0 && (
             <div>
               <h3 className="font-medium mb-3">Size</h3>
@@ -222,7 +215,6 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Quantity */}
           {selectedSize && (
             <div>
               <h3 className="font-medium mb-3">Quantity</h3>
@@ -249,9 +241,8 @@ export default function ProductDetail() {
             </div>
           )}
 
-          {/* Buttons */}
           <div className="space-y-4">
-            {/* Add to cart */}
+          
             <button
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8 w-full disabled:opacity-50 cursor-pointer"
               disabled={
@@ -273,7 +264,6 @@ export default function ProductDetail() {
                 : "Add to cart"}
             </button>
 
-            {/* Wishlist */}
             <button
               onClick={handleWishlistToggle}
               className="inline-flex items-center justify-center gap-2 border h-11 rounded-md px-8 w-full bg-transparent hover:bg-accent cursor-pointer"
@@ -282,10 +272,42 @@ export default function ProductDetail() {
               {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
             </button>
           </div>
+          <div className="border rounded-lg p-4 mt-6">
+            <h2 className="font-semibold mb-4">Product Details</h2>
+            <ul className="space-y-2 text-sm">
+              <li className="flex justify-between">
+                <span className="text-muted-foreground">Brand:</span>
+                <span>{product.brand}</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-muted-foreground">Model:</span>
+                <span>{product.name}</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-muted-foreground">Category:</span>
+                <span>{product.category || "-"}</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-muted-foreground">Gender:</span>
+                <span>{product.gender || "-"}</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-muted-foreground">Available Colors:</span>
+                <span>
+                  {product.colors?.map((c) => c.name).join(", ") || "-"}
+                </span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-muted-foreground">Available Sizes:</span>
+                <span>
+                  {product.sizes?.map((s: any) => s.size).join(", ") || "-"}
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      {/* Related Products */}
       <section className="mt-16">
         <h2 className="text-2xl font-bold mb-8">Related Products</h2>
         {relatedProducts.length ? (
