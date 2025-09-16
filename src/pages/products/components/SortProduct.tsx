@@ -104,16 +104,28 @@ const ProductFilters = () => {
     else setList([...list, value]);
   };
 
-  const handleApply = () => {
-    const params = new URLSearchParams();
-    selectedBrands.forEach((b) => params.append("brand", b));
-    selectedCategories.forEach((c) => params.append("category", c));
-    selectedGenders.forEach((g) => params.append("gender", g));
-    selectedSizes.forEach((s) => params.append("size", s));
-    params.append("minPrice", String(priceRange[0]));
-    params.append("maxPrice", String(priceRange[1]));
-    setSearchParams(params); // ✅ cập nhật URL
-  };
+ const handleApply = () => {
+  // clone params cũ để giữ lại các filter trước
+  const params = new URLSearchParams(searchParams);
+
+  // clear brand / category / gender / size trước khi append lại
+  params.delete("brand");
+  params.delete("category");
+  params.delete("gender");
+  params.delete("size");
+
+  selectedBrands.forEach((b) => params.append("brand", b));
+  selectedCategories.forEach((c) => params.append("category", c));
+  selectedGenders.forEach((g) => params.append("gender", g));
+  selectedSizes.forEach((s) => params.append("size", s));
+
+  // luôn cập nhật giá mới nhất
+  params.set("minPrice", String(priceRange[0]));
+  params.set("maxPrice", String(priceRange[1]));
+
+  setSearchParams(params);
+};
+
 
   const handleClear = () => {
     setSelectedBrands([]);

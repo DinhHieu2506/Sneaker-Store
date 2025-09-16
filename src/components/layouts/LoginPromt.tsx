@@ -1,4 +1,5 @@
 import { ShoppingBag, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type LoginPromptProps = {
   feature?: "cart" | "wishlist";
@@ -16,13 +17,13 @@ const LoginPrompt = ({ feature = "cart" }: LoginPromptProps) => {
         <p className="text-muted-foreground mb-8">
           You need to login to view your {isCart ? "cart" : "wishlist"}
         </p>
-        <a
+        <Link
           className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium 
                      bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-          href="/auth/login"
+          to="/auth/login"
         >
           Login
-        </a>
+        </Link>
       </div>
     </main>
   );

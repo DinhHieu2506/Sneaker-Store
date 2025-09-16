@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Banner() {
     return (    
       <section className="relative bg-gradient-to-r from-slate-900 to-slate-700 text-white">
@@ -8,12 +10,12 @@ export default function Banner() {
                             Discover the latest sneakers from top brands. Authentic products, fast shipping, and unbeatable prices.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <a className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8" href="/products">
+                            <Link className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8" to="/products">
                                 Shop Now
-                            </a>
-                            <a className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 rounded-md px-8 text-[#020817]" href="/products?featured=true">
+                            </Link>
+                            <Link className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 rounded-md px-8 text-[#020817]" to="/products?featured=true">
                                 Featured Products
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>

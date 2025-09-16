@@ -5,12 +5,14 @@ import { useWishlistStore } from "../../zustand/wishlist";
 import { useAuthStore } from "../../zustand/auth";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useSearchParams } from "react-router-dom";
 
 export default function Header() {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const cart = useCartStore((state) => state.cart);
   const wishlist = useWishlistStore((state) => state.wishlist);
@@ -23,6 +25,19 @@ export default function Header() {
       navigate(`/products?search=${encodeURIComponent(query)}`);
       setQuery("");
     }
+  };
+
+  const makeUrl = (base: string, extra: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams);
+
+    // params.delete("search");
+
+    Object.entries(extra).forEach(([key, val]) => {
+      if (val === null) params.delete(key);
+      else params.set(key, val);
+    });
+
+    return `${base}?${params.toString()}`;
   };
 
   useEffect(() => {
@@ -50,6 +65,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
+          {/* logo */}
           <Link className="flex items-center space-x-2" to="/">
             <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">
@@ -61,25 +77,25 @@ export default function Header() {
 
           <nav className="hidden md:flex items-center space-x-6">
             <Link
-              to="/products"
+              to={makeUrl("/products", { gender: null, featured: null })}
               className="text-sm font-medium hover:text-primary transition-colors"
             >
               All Products
             </Link>
             <Link
-              to="/products?gender=Men"
+              to={makeUrl("/products", { gender: "Men" })}
               className="text-sm font-medium hover:text-primary transition-colors"
             >
               Men
             </Link>
             <Link
-              to="/products?gender=Women"
+              to={makeUrl("/products", { gender: "Women" })}
               className="text-sm font-medium hover:text-primary transition-colors"
             >
               Women
             </Link>
             <Link
-              to="/products?featured=true"
+              to={makeUrl("/products", { featured: "true" })}
               className="text-sm font-medium hover:text-primary transition-colors"
             >
               Featured

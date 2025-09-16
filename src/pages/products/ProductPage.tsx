@@ -11,12 +11,12 @@ export default function Products() {
     fetchProducts,
     fetchFeaturedProducts,
     applyFilters,
-    searchProducts,
   } = useProductsStore();
 
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    console.log('Render')
     const searchQuery = searchParams.get("search");
     const brands = searchParams.getAll("brand");
     const categories = searchParams.getAll("category");
@@ -27,7 +27,14 @@ export default function Products() {
     const isFeatured = searchParams.get("featured") === "true"; 
 
     if (searchQuery) {
-      searchProducts(searchQuery);
+      applyFilters({
+        brands,
+        categories,
+        genders,
+        sizes,
+        priceRange: [minPrice, maxPrice],
+        search: searchQuery || "",
+      });
     } else if (isFeatured) {
       fetchFeaturedProducts(); 
     } else if (
@@ -44,11 +51,17 @@ export default function Products() {
         genders,
         sizes,
         priceRange: [minPrice, maxPrice],
+        search: searchQuery || "",
       });
     } else {
       fetchProducts(); 
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    window && window.scrollTo(0, 0);
+
+  }, [searchParams])
 
   return (
     <main className="min-h-screen">

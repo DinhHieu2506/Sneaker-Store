@@ -38,6 +38,7 @@ interface ProductsState {
     genders: string[];
     sizes: string[];
     priceRange: number[];
+    search: string
   }) => void;
   clearFilters: () => void;
 
@@ -198,7 +199,7 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     set({ products: filtered });
   },
 
-  applyFilters: async ({ brands, categories, genders, sizes, priceRange }) => {
+  applyFilters: async ({ brands, categories, genders, sizes, priceRange, search }) => {
     set({ loading: true, error: null });
     try {
       const params = new URLSearchParams();
@@ -218,6 +219,9 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       if (priceRange.length === 2) {
         params.append("minPrice", String(priceRange[0]));
         params.append("maxPrice", String(priceRange[1]));
+      }
+      if (search.trim()) {
+        params.append("search", search.trim());
       }
 
       const res = await api.get(`/products?${params.toString()}`);

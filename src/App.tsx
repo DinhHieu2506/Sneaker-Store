@@ -1,22 +1,24 @@
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
-import Home from "./pages/homes/HomePage";
+import Header from "./components/layouts/Header";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import CartPage from "./pages/cart/CartPage";
+import Home from "./pages/homes/HomePage";
+import ProductDetail from "./pages/products/ProductDetail";
 import Products from "./pages/products/ProductPage";
 import WishlistPage from "./pages/wishlist/WishlistPage";
-import ProductDetail from "./pages/products/ProductDetail";
 
 import { Toaster } from "sonner";
+import ScrollToTop from "./components/layouts/ScrollToTop";
 
 function App() {
   return (
     <Router>
       <Header />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />

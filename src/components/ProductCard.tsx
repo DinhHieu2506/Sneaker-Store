@@ -3,6 +3,7 @@ import { useWishlistStore } from "../zustand/wishlist";
 import { useAuthStore } from "../zustand/auth";
 import HeartIcon from "./ui/icon/heart";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 type Color = { _id: string; name: string; hexCode: string };
 
@@ -57,7 +58,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div className="rounded-xl border bg-white shadow-sm group hover:shadow-lg overflow-hidden">
-      <a href={`/products/${pid}`} className="block">
+      <Link to={`/products/${pid}`} className="block">
         <div className="aspect-square relative overflow-hidden">
           <img
             alt={name}
@@ -83,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <h3 className="font-semibold line-clamp-2">{name}</h3>
           <p className="text-lg font-bold mt-2">${price}</p>
         </div>
-      </a>
+      </Link>
     </div>
   );
 };

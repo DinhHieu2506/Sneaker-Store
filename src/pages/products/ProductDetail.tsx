@@ -1,12 +1,14 @@
-import { useEffect, useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
-import { useProductsStore, type Product } from "../../zustand/products";
-import { useAuthStore } from "../../zustand/auth";
-import ShoppingCartIcon from "../../components/ui/icon/shopping";
-import HeartIcon from "../../components/ui/icon/heart";
-import { useCartStore } from "../../zustand/cart";
-import { useWishlistStore } from "../../zustand/wishlist";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import HeartIcon from "../../components/ui/icon/heart";
+import ShoppingCartIcon from "../../components/ui/icon/shopping";
+import { useAuthStore } from "../../zustand/auth";
+import { useCartStore } from "../../zustand/cart";
+import { useProductsStore, type Product } from "../../zustand/products";
+import { useWishlistStore } from "../../zustand/wishlist";
+
+type ProductSize = { _id: string; size: string; stock: number };
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +24,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!products.length) {
       fetchProducts();
@@ -34,6 +38,25 @@ export default function ProductDetail() {
       setProduct(found || null);
     }
   }, [id, products]);
+
+  useEffect(() => {
+    if (product) {
+      if (product.colors?.length > 0) {
+        setSelectedColor(product.colors[0].name);
+      } else {
+        setSelectedColor(null);
+      }
+
+      if (typeof product.sizes !== "string") {
+        const availableSize = (product.sizes as unknown as ProductSize[]).find(
+          (s) => s.stock > 0
+        );
+        setSelectedSize(availableSize ? availableSize.size : null);
+      } else setSelectedSize(product.sizes?.[0] || null);
+
+      setQuantity(1);
+    }
+  }, [product]);
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -60,21 +83,22 @@ export default function ProductDetail() {
     );
   }
 
-  type ProductSize = { _id: string; size: string; stock: number };
-
   const selectedSizeStock =
     (product.sizes as ProductSize[] | undefined)?.find(
       (s) => s.size === selectedSize
     )?.stock || 0;
 
-  const isInCart = cart.some(
-    (item) =>
-      item.productId === product.id &&
-      item.size === selectedSize &&
-      (selectedColor ? item.product?.name === product.name : true)
-  );
-
   const isInWishlist = !!getWishlistItemById(product.id);
+
+  const handleChangeSize = (size: string) => {
+    setSelectedSize(size);
+    setQuantity(1);
+  };
+
+  const handleChangeColor = (color: string) => {
+    setSelectedColor(color);
+    setQuantity(1);
+  };
 
   const handleDecreaseQuantity = () => {
     if (quantity > 1) {
@@ -83,21 +107,42 @@ export default function ProductDetail() {
   };
 
   const handleIncreaseQuantity = () => {
-    if (quantity < 10 && quantity < selectedSizeStock) {
+    if (quantity < selectedSizeStock) {
       setQuantity(quantity + 1);
     }
   };
 
   const handleAddToCart = async () => {
     if (!user) {
-      toast.error("You need to login to add to cart");
+      navigate("/auth/login");
       return;
     }
     if (!product || !selectedSize) return;
+
     try {
       setAdding(true);
-      await addToCart({ id: product.id, size: selectedSize, quantity });
-      toast.success("Added to cart 🛒");
+
+      const existingItem = cart.find(
+        (item) => item.productId === product.id && item.size === selectedSize
+      );
+
+      await addToCart({
+        id: product.id,
+        size: selectedSize,
+        quantity,
+      });
+
+      if (existingItem) {
+        toast.success(
+          `Updated quantity of ${product.name} (size ${selectedSize}) 🛒`
+        );
+      } else {
+        toast.success(
+          `Added ${quantity} ${product.name} (size ${selectedSize}) 🛒`
+        );
+      }
+    } catch {
+      toast.error("Failed to add to cart ❌");
     } finally {
       setAdding(false);
     }
@@ -105,7 +150,7 @@ export default function ProductDetail() {
 
   const handleWishlistToggle = async () => {
     if (!user) {
-      toast.error("You need to login to manage wishlist");
+      navigate("/auth/login");
       return;
     }
     if (!product) return;
@@ -167,7 +212,7 @@ export default function ProductDetail() {
                 {product.colors.map((c) => (
                   <button
                     key={c._id}
-                    onClick={() => setSelectedColor(c.name)}
+                    onClick={() => handleChangeColor(c.name)}
                     className={`w-10 h-10 rounded-full border-2 flex items-center justify-center cursor-pointer ${
                       selectedColor === c.name
                         ? "border-primary ring-2 ring-primary/40"
@@ -193,7 +238,7 @@ export default function ProductDetail() {
                 {product.sizes.map((s: any) => (
                   <button
                     key={s._id}
-                    onClick={() => setSelectedSize(s.size)}
+                    onClick={() => handleChangeSize(s.size)}
                     disabled={s.stock === 0}
                     className={`py-2 px-3 border rounded-md text-center cursor-pointer ${
                       selectedSize === s.size
@@ -228,12 +273,12 @@ export default function ProductDetail() {
                 <button
                   onClick={handleIncreaseQuantity}
                   className="w-10 h-10 border rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-100 active:scale-90"
-                  disabled={quantity >= 10 || quantity >= selectedSizeStock}
+                  disabled={quantity >= selectedSizeStock}
                 >
                   +
                 </button>
                 <span className="text-sm text-muted-foreground ml-2">
-                  Max: 10
+                  Max: {selectedSizeStock}
                 </span>
               </div>
             </div>
@@ -242,20 +287,14 @@ export default function ProductDetail() {
           <div className="space-y-4">
             <button
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8 w-full disabled:opacity-50 cursor-pointer"
-              disabled={
-                !selectedSize || selectedSizeStock === 0 || adding || isInCart
-              }
+              disabled={!selectedSize || selectedSizeStock === 0 || adding}
               onClick={handleAddToCart}
             >
               <ShoppingCartIcon />
               {!user
                 ? "Login to buy"
-                : !selectedSize
-                ? "Add to cart"
                 : selectedSizeStock === 0
                 ? "Out of Stock"
-                : isInCart
-                ? "Added to cart"
                 : adding
                 ? "Adding..."
                 : "Add to cart"}
@@ -266,9 +305,14 @@ export default function ProductDetail() {
               className="inline-flex items-center justify-center gap-2 border h-11 rounded-md px-8 w-full bg-transparent hover:bg-accent cursor-pointer"
             >
               <HeartIcon filled={isInWishlist} />
-              {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+              {user
+                ? isInWishlist
+                  ? "Remove from Wishlist"
+                  : "Add to Wishlist"
+                : "Login to use wishlist"}
             </button>
           </div>
+
           <div className="border rounded-lg p-4 mt-6">
             <h2 className="font-semibold mb-4">Product Details</h2>
             <ul className="space-y-2 text-sm">
