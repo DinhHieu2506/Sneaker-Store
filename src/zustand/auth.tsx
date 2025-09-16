@@ -33,7 +33,9 @@ interface AuthState {
   loading: boolean;
   error: string | null;
 
-  register: (payload: Omit<User, "id"> & { password: string }) => Promise<boolean>;
+  register: (
+    payload: Omit<User, "id"> & { password: string }
+  ) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
   checkAuth: () => Promise<boolean>;
   logout: () => void;
@@ -65,7 +67,6 @@ export const useAuthStore = create<AuthState>()(
       loading: false,
       error: null,
 
-      /** Đăng ký */
       register: async (payload) => {
         try {
           set({ loading: true, error: null });
@@ -73,17 +74,22 @@ export const useAuthStore = create<AuthState>()(
           set({ loading: false });
           return true;
         } catch (err: any) {
-          const msg = err?.response?.data?.message || err?.message || "Registration failed";
+          const msg =
+            err?.response?.data?.message ||
+            err?.message ||
+            "Registration failed";
           set({ error: msg, loading: false });
           return false;
         }
       },
 
-      /** Đăng nhập */
       login: async (email, password) => {
         try {
           set({ loading: true, error: null });
-          const res = await api.post<LoginResponse>("/auth/login", { email, password });
+          const res = await api.post<LoginResponse>("/auth/login", {
+            email,
+            password,
+          });
 
           const block = res.data?.data ?? res.data;
           const token = block?.token;
@@ -92,22 +98,35 @@ export const useAuthStore = create<AuthState>()(
 
           const user = normalizeUser(apiUser);
 
-          set({ user, token, isAuthenticated: true, loading: false, error: null });
+          set({
+            user,
+            token,
+            isAuthenticated: true,
+            loading: false,
+            error: null,
+          });
 
-          // fetch global data
-          useWishlistStore.getState().fetchWishlist();
-          useCartStore.getState().fetchCart();
-          useProductsStore.getState().fetchProducts();
+          await Promise.all([
+            useWishlistStore.getState().fetchWishlist(),
+            useCartStore.getState().fetchCart(),
+            useProductsStore.getState().fetchProducts(),
+          ]);
 
           return true;
         } catch (err: any) {
-          const msg = err?.response?.data?.message || err?.message || "Login failed";
-          set({ error: msg, loading: false, user: null, token: null, isAuthenticated: false });
+          const msg =
+            err?.response?.data?.message || err?.message || "Login failed";
+          set({
+            error: msg,
+            loading: false,
+            user: null,
+            token: null,
+            isAuthenticated: false,
+          });
           return false;
         }
       },
 
-      /** Kiểm tra phiên khi reload */
       checkAuth: async () => {
         const token = get().token;
         if (!token) {
@@ -120,24 +139,36 @@ export const useAuthStore = create<AuthState>()(
           const user = normalizeUser(res.data?.data ?? res.data);
           set({ user, isAuthenticated: true, loading: false });
 
-          // fetch global data sau reload
-          useWishlistStore.getState().fetchWishlist();
-          useCartStore.getState().fetchCart();
-          useProductsStore.getState().fetchProducts();
+          await Promise.all([
+            useWishlistStore.getState().fetchWishlist(),
+            useCartStore.getState().fetchCart(),
+            useProductsStore.getState().fetchProducts(),
+          ]);
 
           return true;
         } catch {
-          set({ user: null, token: null, isAuthenticated: false, loading: false, error: "Session expired" });
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            loading: false,
+            error: "Session expired",
+          });
           return false;
         }
       },
 
-      /** Đăng xuất */
       logout: () => {
-        set({ user: null, token: null, isAuthenticated: false, loading: false, error: null });
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          loading: false,
+          error: null,
+        });
         useWishlistStore.getState().clearWishlist();
         useCartStore.getState().clearCart();
-        localStorage.removeItem("auth"); // clear persist
+        localStorage.removeItem("auth");
       },
     }),
     {

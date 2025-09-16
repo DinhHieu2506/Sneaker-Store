@@ -1,14 +1,19 @@
 
 
-const HeartIcon = ({ filled = false }: { filled?: boolean }) => (
+const HeartIcon = ({ filled = false }: { filled?: boolean }) => ( 
   <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={24}
+    height={24}
     viewBox="0 0 24 24"
-    className="h-5 w-5"
     fill={filled ? "currentColor" : "none"}
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="lucide lucide-heart h-4 w-4 fill-current"
   >
-    <path d="M20.84 4.61c-1.54-1.32-3.77-1.04-5.12.35L12 8.09 8.28 4.96C6.93 3.57 4.7 3.29 3.16 4.61 1.2 6.3 1.34 9.3 3.39 11.12L12 19l8.61-7.88c2.05-1.82 2.19-4.82.23-6.51Z" />
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
   </svg>
 );
 

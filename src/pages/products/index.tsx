@@ -5,8 +5,15 @@ import ProductCard from "../../components/product-card";
 import SortProduct from "./components/sort-product";
 
 export default function Products() {
-  const { products, loading, fetchProducts, applyFilters, searchProducts } =
-    useProductsStore();
+  const {
+    products,
+    loading,
+    fetchProducts,
+    fetchFeaturedProducts,
+    applyFilters,
+    searchProducts,
+  } = useProductsStore();
+
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -17,9 +24,12 @@ export default function Products() {
     const sizes = searchParams.getAll("size");
     const minPrice = Number(searchParams.get("minPrice")) || 0;
     const maxPrice = Number(searchParams.get("maxPrice")) || 500;
+    const isFeatured = searchParams.get("featured") === "true"; 
 
     if (searchQuery) {
       searchProducts(searchQuery);
+    } else if (isFeatured) {
+      fetchFeaturedProducts(); 
     } else if (
       brands.length ||
       categories.length ||
@@ -28,7 +38,6 @@ export default function Products() {
       searchParams.has("minPrice") ||
       searchParams.has("maxPrice")
     ) {
-      // Có filter → gọi applyFilters
       applyFilters({
         brands,
         categories,
@@ -37,7 +46,7 @@ export default function Products() {
         priceRange: [minPrice, maxPrice],
       });
     } else {
-      fetchProducts();
+      fetchProducts(); 
     }
   }, [searchParams]);
 
@@ -49,7 +58,11 @@ export default function Products() {
 
           <main className="flex-1 space-y-6">
             <div className="mb-6">
-              <h1 className="text-2xl font-bold mb-2">All Products</h1>
+              <h1 className="text-2xl font-bold mb-2">
+                {searchParams.get("featured") === "true"
+                  ? "Featured Products"
+                  : "All Products"}
+              </h1>
               <p>{products?.length || 0} products found</p>
             </div>
 

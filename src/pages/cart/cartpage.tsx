@@ -3,6 +3,8 @@ import { useCartStore } from "../../zustand/cart";
 import { useAuthStore } from "../../zustand/auth";
 import LoginPrompt from "../../components/layouts/LoginPromt";
 import { Trash2 } from "lucide-react";
+import EmptyState from "@/components/layouts/EmtyState";
+import { toast } from "sonner";
 
 import {
   AlertDialog,
@@ -18,9 +20,13 @@ import {
 
 export default function CartPage() {
   const { user, token } = useAuthStore();
+  const { cart } = useCartStore();
 
   if (!user || !token) {
     return <LoginPrompt />;
+  }
+  if (!cart.length) {
+    return <EmptyState feature="cart" />;
   }
 
   return <CartPageInner />;
@@ -98,7 +104,6 @@ function CartPageInner() {
                     </button>
                   </div>
 
-                  {/* Remove with confirm */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button className="ml-4 text-red-500 hover:text-red-700 cursor-pointer">
@@ -152,7 +157,14 @@ function CartPageInner() {
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-red-500 hover:bg-red-600 "
-                      onClick={clearCart}
+                      onClick={async () => {
+                        try {
+                          await clearCart();
+                          toast.success("Cart cleared ");
+                        } catch {
+                          toast.error("Failed to clear cart");
+                        }
+                      }}
                     >
                       Clear
                     </AlertDialogAction>
@@ -178,7 +190,7 @@ function CartPageInner() {
               <span>Subtotal:</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
-               <div className="flex justify-between">
+            <div className="flex justify-between">
               <span>Shipping:</span>
               <span>Free</span>
             </div>
@@ -186,7 +198,7 @@ function CartPageInner() {
               <span>Tax:</span>
               <span>${tax.toFixed(2)}</span>
             </div>
-          
+
             <hr />
             <div className="flex justify-between font-bold text-lg">
               <span>Total:</span>

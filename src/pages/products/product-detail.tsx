@@ -5,7 +5,7 @@ import { useAuthStore } from "../../zustand/auth";
 import ShoppingCartIcon from "../../components/ui/icon/shopping";
 import HeartIcon from "../../components/ui/icon/heart";
 import { useCartStore } from "../../zustand/cart";
-import { useWishlistStore } from "../../zustand/wishlist"; // 👈 thêm import
+import { useWishlistStore } from "../../zustand/wishlist"; 
 import { toast } from "sonner";
 
 export default function ProductDetail() {
@@ -35,7 +35,7 @@ export default function ProductDetail() {
     }
   }, [id, products]);
 
-  // Related products
+  
   const relatedProducts = useMemo(() => {
     if (!product) return [];
     return products
@@ -103,7 +103,6 @@ export default function ProductDetail() {
       setAdding(false);
     }
   };
-
 
   const handleWishlistToggle = async () => {
     if (!user) {
@@ -242,7 +241,6 @@ export default function ProductDetail() {
           )}
 
           <div className="space-y-4">
-          
             <button
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8 w-full disabled:opacity-50 cursor-pointer"
               disabled={

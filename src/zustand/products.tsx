@@ -24,12 +24,10 @@ interface ProductsState {
   loading: boolean;
   error: string | null;
 
-  /** API actions */
   fetchProducts: () => Promise<void>;
   fetchFeaturedProducts: () => Promise<void>;
   fetchArrivalsProducts: () => Promise<void>;
 
-  /** Filters */
   fetchProductsByGender: (gender: "Men" | "Women") => Promise<void>;
   fetchProductsByCategory: (category: string) => Promise<void>;
   fetchCategories: () => Promise<void>;
@@ -43,7 +41,6 @@ interface ProductsState {
   }) => void;
   clearFilters: () => void;
 
-  /** Helpers */
   getProductById: (id: string) => Product | null;
 }
 
@@ -77,7 +74,6 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
   loading: false,
   error: null,
 
-  /** Fetch tất cả sản phẩm */
   fetchProducts: async () => {
     set({ loading: true, error: null });
     try {
@@ -103,7 +99,6 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Featured */
   fetchFeaturedProducts: async () => {
     set({ loading: true, error: null });
     try {
@@ -120,7 +115,6 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Arrivals */
   fetchArrivalsProducts: async () => {
     set({ loading: true, error: null });
     try {
@@ -136,7 +130,6 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Filter theo gender */
   fetchProductsByGender: async (gender: "Men" | "Women") => {
     set({ loading: true, error: null });
     try {
@@ -153,7 +146,6 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Filter theo category */
   fetchProductsByCategory: async (category: string) => {
     set({ loading: true, error: null });
     try {
@@ -170,16 +162,12 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Lấy categories */
-  /** Lấy categories từ danh sách products */
   fetchCategories: async () => {
     set({ loading: true, error: null });
     try {
       const res = await api.get("/products");
       const sneakers = res.data.data?.sneakers || [];
       const mapped = mapProducts(sneakers);
-
-      // lấy unique categories
       const categories: string[] = Array.from(
         new Set(mapped.map((item) => item.category?.trim() || "Other"))
       );
@@ -193,18 +181,14 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Search theo tên/brand */
   searchProducts: (query: string) => {
     const { allProducts } = get();
     const normalized = query.trim().toLowerCase();
 
-    // Nếu không có search thì reset về trạng thái ban đầu
     if (!normalized) {
       set({ products: allProducts });
       return;
     }
-
-    // Lọc theo tên hoặc brand
     const filtered = allProducts.filter((item) =>
       [item.name, item.brand].some((field) =>
         field?.toLowerCase().includes(normalized)
@@ -214,7 +198,6 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     set({ products: filtered });
   },
 
-  /** Apply filters nâng cao */
   applyFilters: async ({ brands, categories, genders, sizes, priceRange }) => {
     set({ loading: true, error: null });
     try {
@@ -250,12 +233,10 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
     }
   },
 
-  /** Reset về tất cả */
   clearFilters: async () => {
     await get().fetchProducts();
   },
 
-  /** Helper: lấy product theo id */
   getProductById: (id: string) => {
     const { allProducts } = get();
     return allProducts.find((p) => p.id === id) || null;

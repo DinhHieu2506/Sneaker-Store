@@ -267,7 +267,6 @@ export default function Signup() {
                 </div>
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}

@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Trash2, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import LoginPrompt from "../../components/layouts/LoginPromt";
 
 import { useAuthStore } from "../../zustand/auth";
 import { useWishlistStore } from "../../zustand/wishlist";
+import EmptyState from "@/components/layouts/EmtyState";
 
 import {
   AlertDialog,
@@ -26,6 +28,7 @@ const formatCurrency = (n: number) =>
 
 export default function WishlistPage() {
   const { user, token } = useAuthStore();
+
   const {
     wishlist,
     fetchWishlist,
@@ -38,23 +41,14 @@ export default function WishlistPage() {
     if (token) fetchWishlist();
   }, [token, fetchWishlist]);
 
-  if (!token || !user) {
-    return (
-      <main className="min-h-screen container mx-auto px-4 py-16">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">My Wishlist</h1>
-          <p className="text-muted-foreground">
-            Please sign in to view your wishlist.
-          </p>
-        </div>
-      </main>
-    );
+  if (!token || !user) return <LoginPrompt feature="wishlist" />;
+  if (!wishlist.length) {
+    return <EmptyState feature="wishlist" />;
   }
 
   return (
     <main className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">My Wishlist</h1>
@@ -87,7 +81,7 @@ export default function WishlistPage() {
                     onClick={async () => {
                       try {
                         await clearWishlist();
-                        toast.success("Wishlist cleared 🗑️");
+                        toast.success("Wishlist cleared ");
                       } catch {
                         toast.error("Failed to clear wishlist");
                       }
@@ -101,14 +95,6 @@ export default function WishlistPage() {
           )}
         </div>
 
-        {/* Empty state */}
-        {!loading && wishlist.length === 0 && (
-          <div className="text-center text-gray-500 py-24">
-            Your wishlist is empty.
-          </div>
-        )}
-
-        {/* Wishlist grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {wishlist.map((item) => (
             <div
@@ -131,7 +117,6 @@ export default function WishlistPage() {
                   )}
                 </Link>
 
-                {/* Trash button riêng, không nằm trong Link */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -170,7 +155,6 @@ export default function WishlistPage() {
                 </AlertDialog>
               </div>
 
-              {/* Info */}
               <div className="p-4">
                 <Link to={`/products/${item.productId}`}>
                   <h3 className="font-semibold line-clamp-2">{item.name}</h3>
@@ -192,7 +176,6 @@ export default function WishlistPage() {
           ))}
         </div>
 
-        {/* Loading skeleton */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
             {Array.from({ length: 8 }).map((_, i) => (

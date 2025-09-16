@@ -17,19 +17,20 @@ export default function Header() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
-  // ✅ handle search
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
       navigate(`/products?search=${encodeURIComponent(query)}`);
-      setQuery(""); // reset input sau khi submit
+      setQuery("");
     }
   };
 
-  // ✅ handle click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -37,7 +38,6 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ handle ESC key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -50,31 +50,42 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
           <Link className="flex items-center space-x-2" to="/">
             <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">S</span>
+              <span className="text-primary-foreground font-bold text-sm">
+                S
+              </span>
             </div>
             <span className="font-bold text-xl">SneakerHub</span>
           </Link>
 
-          {/* Nav */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/products" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              to="/products"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               All Products
             </Link>
-            <Link to="/products?gender=Men" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              to="/products?gender=Men"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Men
             </Link>
-            <Link to="/products?gender=Women" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              to="/products?gender=Women"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Women
             </Link>
-            <Link to="/products?featured=true" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link
+              to="/products?featured=true"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Featured
             </Link>
           </nav>
 
-          {/* Search */}
           <form
             onSubmit={handleSearch}
             className="hidden md:flex items-center space-x-2 flex-1 max-w-sm mx-6"
@@ -94,9 +105,7 @@ export default function Header() {
             </div>
           </form>
 
-          {/* Icons */}
           <div className="flex items-center space-x-2 relative">
-            {/* Wishlist */}
             <Link
               to="/wishlist"
               className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-accent hover:text-accent-foreground rounded-md"
@@ -110,7 +119,6 @@ export default function Header() {
               <span className="sr-only">Wishlist</span>
             </Link>
 
-            {/* Cart */}
             <Link
               to="/cart"
               className="relative inline-flex items-center justify-center h-10 w-10 hover:bg-accent hover:text-accent-foreground rounded-md"
@@ -124,7 +132,6 @@ export default function Header() {
               <span className="sr-only">Shopping cart</span>
             </Link>
 
-            {/* User / Login */}
             {!user ? (
               <Link
                 to="/auth/login"

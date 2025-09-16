@@ -61,7 +61,6 @@ export const useCartStore = create<CartState>((set, get) => ({
   loading: false,
   error: null,
 
-  /** Lấy giỏ hàng */
   fetchCart: async () => {
     set({ loading: true, error: null });
     try {
@@ -77,7 +76,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  /** Thêm vào giỏ */
   addToCart: async ({ id, size, quantity }) => {
     set({ loading: true, error: null });
     try {
@@ -98,7 +96,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  /** Cập nhật số lượng */
   updateQuantity: async (itemId, qty) => {
     set((state) => ({
       cart: state.cart.map((item) =>
@@ -112,7 +109,6 @@ export const useCartStore = create<CartState>((set, get) => ({
 
       await get().fetchCart();
     } catch (err: any) {
-      // Nếu fail thì rollback
       await get().fetchCart();
       set({
         error: err?.message || "Failed to update quantity",
@@ -120,7 +116,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  /** Xoá 1 item */
   removeFromCart: async (itemId) => {
     set({ loading: true, error: null });
     try {
@@ -134,7 +129,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  /** Xoá toàn bộ giỏ */
   clearCart: async () => {
     set({ loading: true, error: null });
     try {
@@ -148,7 +142,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     }
   },
 
-  /** ---- Helpers ---- */
   getTotalItems: () => {
     const cart = get().cart ?? [];
     return cart.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
