@@ -1,30 +1,31 @@
 import { useEffect } from "react";
 import { useProductsStore } from "../../zustand/products";
-import ProductCard from "../../components/product-card"; // import card đã có sẵn
+import ProductCard from "../../components/ProductCard";
 
-export default function Arrivals() {
+export default function Feature() {
   const {
     products = [],
-    fetchArrivalsProducts,
+    fetchFeaturedProducts,
     loading,
     error,
   } = useProductsStore();
 
   useEffect(() => {
-    fetchArrivalsProducts();
-  }, [fetchArrivalsProducts]);
+    fetchFeaturedProducts();
+  }, [fetchFeaturedProducts]);
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        {/* Heading */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">New Arrivals</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Featured Products
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover the latest sneakers freshly added to our collection
+            Handpicked sneakers that represent the best in style, comfort, and
+            performance
           </p>
         </div>
-
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
@@ -32,7 +33,7 @@ export default function Arrivals() {
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : products.length === 0 ? (
-          <p className="text-center">No new arrivals found.</p>
+          <p className="text-center">No featured products found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
@@ -52,13 +53,12 @@ export default function Arrivals() {
             ))}
           </div>
         )}
-
         <div className="text-center mt-12">
           <a
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 rounded-md px-8"
-            href="/products?arrivals=true"
+            href="/products?featured=true"
           >
-            View All Arrivals
+            View All Featured
           </a>
         </div>
       </div>

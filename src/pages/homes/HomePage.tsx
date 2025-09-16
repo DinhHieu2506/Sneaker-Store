@@ -1,7 +1,7 @@
-import Banner from "./banner";
-import Feature from "./features";
-import Arrivals from "./arrivals";
-import Category from "./category";
+import Banner from "./Banner";
+import Feature from "./Feature";
+import Arrivals from "./Arrivals";
+import Category from "./Category";
 
 export default function Home() {
   return (

@@ -5,7 +5,7 @@ import { useAuthStore } from "../../zustand/auth";
 import ShoppingCartIcon from "../../components/ui/icon/shopping";
 import HeartIcon from "../../components/ui/icon/heart";
 import { useCartStore } from "../../zustand/cart";
-import { useWishlistStore } from "../../zustand/wishlist"; 
+import { useWishlistStore } from "../../zustand/wishlist";
 import { toast } from "sonner";
 
 export default function ProductDetail() {
@@ -35,7 +35,6 @@ export default function ProductDetail() {
     }
   }, [id, products]);
 
-  
   const relatedProducts = useMemo(() => {
     if (!product) return [];
     return products

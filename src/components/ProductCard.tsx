@@ -45,7 +45,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
         await removeFromWishlist(pid);
         toast.success("Removed from wishlist ❤️‍🩹");
       } else {
-        // UI sẽ đổi màu ngay vì store cập nhật optimistic + ids map
         await addToWishlist({ productId: pid, name, imageUrl, price });
         toast.success("Added to wishlist ❤️");
       }
@@ -78,7 +77,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         <div className="p-4">
-          <p className="text-xs uppercase tracking-wide text-gray-500">{brand}</p>
+          <p className="text-xs uppercase tracking-wide text-gray-500">
+            {brand}
+          </p>
           <h3 className="font-semibold line-clamp-2">{name}</h3>
           <p className="text-lg font-bold mt-2">${price}</p>
         </div>

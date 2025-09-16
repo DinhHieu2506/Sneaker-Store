@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProductsStore } from "../../zustand/products";
-import ProductCard from "../../components/product-card";
-import SortProduct from "./components/sort-product";
+import ProductCard from "../../components/ProductCard";
+import SortProduct from "./components/SortProduct";
 
 export default function Products() {
   const {

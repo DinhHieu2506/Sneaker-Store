@@ -20,12 +20,19 @@ import {
 
 export default function CartPage() {
   const { user, token } = useAuthStore();
-  const { cart } = useCartStore();
+  const { cart, loading, fetchCart } = useCartStore(); // lấy thêm loading
+
+  useEffect(() => {
+    if (token) {
+      fetchCart();
+    }
+  }, [token, fetchCart]);
 
   if (!user || !token) {
     return <LoginPrompt />;
   }
-  if (!cart.length) {
+
+  if (!loading && !cart.length) {
     return <EmptyState feature="cart" />;
   }
 
@@ -33,18 +40,8 @@ export default function CartPage() {
 }
 
 function CartPageInner() {
-  const {
-    cart,
-    fetchCart,
-    removeFromCart,
-    clearCart,
-    updateQuantity,
-    getSubtotal,
-  } = useCartStore();
-
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+  const { cart, removeFromCart, clearCart, updateQuantity, getSubtotal } =
+    useCartStore();
 
   const subtotal = getSubtotal();
   const tax = subtotal * 0.08;
@@ -56,85 +53,82 @@ function CartPageInner() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
-          {cart.length === 0 ? (
-            <p className="text-muted-foreground">Your cart is empty.</p>
-          ) : (
-            cart.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-lg border bg-card text-card-foreground shadow-sm"
-              >
-                <div className="p-6 flex items-center space-x-4">
-                  <div className="w-20 h-20 overflow-hidden rounded-lg">
-                    <img
-                      src={item.product?.imageUrl || "/placeholder.png"}
-                      alt={item.product?.name || "Unknown"}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">
-                      {item.product?.name || "Unknown Product"}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Size: {item.size}
-                    </p>
-                    <p className="font-bold">
-                      ${item.product?.price?.toFixed(2) ?? "0.00"}
-                    </p>
-                  </div>
-
-                  {/* Quantity Control */}
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="border h-10 w-10 rounded-md cursor-pointer hover:bg-gray-100 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:active:scale-100"
-                      onClick={() =>
-                        updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                      }
-                      disabled={item.quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <button
-                      className="border h-10 w-10 rounded-md cursor-pointer hover:bg-gray-100 active:scale-90"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <button className="ml-4 text-red-500 hover:text-red-700 cursor-pointer">
-                        <Trash2 />
-                      </button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Remove item from cart?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. The product will be
-                          removed from your cart permanently.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-500 hover:bg-red-600"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          Remove
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+          {cart.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-lg border bg-card text-card-foreground shadow-sm"
+            >
+              <div className="p-6 flex items-center space-x-4">
+                <div className="w-20 h-20 overflow-hidden rounded-lg">
+                  <img
+                    src={item.product?.imageUrl || "/placeholder.png"}
+                    alt={item.product?.name || "Unknown"}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold">
+                    {item.product?.name || "Unknown Product"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Size: {item.size}
+                  </p>
+                  <p className="font-bold">
+                    ${item.product?.price?.toFixed(2) ?? "0.00"}
+                  </p>
+                </div>
+
+                {/* Quantity Control */}
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="border h-10 w-10 rounded-md cursor-pointer hover:bg-gray-100 active:scale-90 disabled:opacity-50"
+                    onClick={() =>
+                      updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                    }
+                    disabled={item.quantity <= 1}
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center">{item.quantity}</span>
+                  <button
+                    className="border h-10 w-10 rounded-md cursor-pointer hover:bg-gray-100 active:scale-90"
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Remove button */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="ml-4 text-red-500 hover:text-red-700 cursor-pointer">
+                      <Trash2 />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Remove item from cart?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. The product will be
+                        removed from your cart permanently.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-600"
+                        onClick={() => removeFromCart(item.id)}
+                      >
+                        Remove
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
-            ))
-          )}
+            </div>
+          ))}
 
           {cart.length > 0 && (
             <div className="flex justify-between items-center pt-4">
@@ -182,7 +176,7 @@ function CartPageInner() {
           )}
         </div>
 
-        {/* Order Summary */}
+
         <div>
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 space-y-4">
             <h2 className="text-2xl font-semibold">Order Summary</h2>
