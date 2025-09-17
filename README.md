@@ -1,11 +1,11 @@
 # Challenge: Sneaker-Store
-Practice frontend development with Reactjs
-Manage complex state for products, users, orders, and wishlist Implement key features: Featured Products, New Arrivals, Shop by Category, User Account, Wishlist
-Focus on a modern, responsive UI that delivers a real sneaker shopping experience
+-Practice frontend development with Reactjs
+-Manage complex state for products, users, orders, and wishlist Implement key features: Featured Products, New Arrivals, Shop by Category, User Account, Wishlist
+-Focus on a modern, responsive UI that delivers a real sneaker shopping experience
 
 ## Description:
-Build a modern e-commerce web application for showcasing sneakers.
-The UI provides functionalities to browse products, view product details, search and filter items, manage wishlist, and handle shopping cart operations. The design is responsive, user-friendly, and optimized for both desktop and mobile devices.
+-Build a modern e-commerce web application for showcasing sneakers.
+-The UI provides functionalities to browse products, view product details, search and filter items, manage wishlist, and handle shopping cart operations. The design is responsive, user-friendly, and optimized for both desktop and mobile devices.
 
 ### 1. Home Page
 - GET /products?featured=true → Get featured products  
@@ -55,4 +55,3 @@ The UI provides functionalities to browse products, view product details, search
 - Sonner for toast notifications
 - Axios for API requests
 - json-server hoặc mock API service để mô phỏng backend
-
