@@ -22,11 +22,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   brand,
   name,
   price,
+  colors = [],
 }) => {
   const pid = String(id);
   const { user, token } = useAuthStore();
 
-  // 👉 Theo dõi membership qua ids map để re-render siêu ổn định
   const liked = useWishlistStore((s) => !!s.ids[pid]);
   const addToWishlist = useWishlistStore((s) => s.addToWishlist);
   const removeFromWishlist = useWishlistStore((s) => s.removeFromWishlist);
@@ -82,7 +82,29 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {brand}
           </p>
           <h3 className="font-semibold line-clamp-2">{name}</h3>
-          <p className="text-lg font-bold mt-2">${price}</p>
+
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-lg font-bold">${price}</p>
+
+            {colors.length > 0 && (
+              <div className="flex gap-1">
+                {colors.slice(0, 3).map((c) => (
+                  <span
+                    key={c._id}
+                    className="w-5 h-5 rounded-full border border-gray-300"
+                    style={{ backgroundColor: c.hexCode }}
+                    title={c.name}
+                  />
+                ))}
+
+                {colors.length > 3 && (
+                  <span className="w-5 h-5 rounded-full border flex items-center justify-center text-[10px] bg-gray-100 text-gray-600">
+                    +{colors.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </Link>
     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import ProductCard from "@/components/ProductCard";
 import HeartIcon from "../../components/ui/icon/heart";
 import ShoppingCartIcon from "../../components/ui/icon/shopping";
 import { useAuthStore } from "../../zustand/auth";
@@ -213,14 +214,21 @@ export default function ProductDetail() {
                   <button
                     key={c._id}
                     onClick={() => handleChangeColor(c.name)}
-                    className={`w-10 h-10 rounded-full border-2 flex items-center justify-center cursor-pointer ${
-                      selectedColor === c.name
-                        ? "border-primary ring-2 ring-primary/40"
-                        : "border-gray-300"
-                    }`}
+                    className={`w-10 h-10 rounded-full border-2 flex items-center justify-center cursor-pointer shadow-sm
+            ${
+              selectedColor === c.name
+                ? "border-primary ring-2 ring-primary/40"
+                : "border-gray-300"
+            }`}
                     style={{ backgroundColor: c.hexCode }}
                     title={c.name}
-                  />
+                  >
+                    {selectedColor === c.name &&
+                      c.hexCode.toLowerCase() !== "#ffffff" &&
+                      c.name.toLowerCase() !== "white" && (
+                        <span className="w-2 h-2 bg-white rounded-full"></span>
+                      )}
+                  </button>
                 ))}
               </div>
               {selectedColor && (
@@ -354,20 +362,19 @@ export default function ProductDetail() {
         {relatedProducts.length ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {relatedProducts.map((p) => (
-              <Link
-                to={`/products/${p.id}`}
-                key={p.id}
-                className="rounded-lg border p-4 hover:shadow"
-              >
-                <img
-                  src={p.imageUrl}
-                  alt={p.name}
-                  className="aspect-square object-cover rounded-md mb-3"
+              <div key={p.id} className="relative">
+                <ProductCard
+                  id={p.id}
+                  imageUrl={p.imageUrl}
+                  brand={p.brand}
+                  name={p.name}
+                  price={p.price}
                 />
-                <p className="text-sm text-muted-foreground">{p.brand}</p>
-                <h3 className="font-medium">{p.name}</h3>
-                <p className="font-bold">${p.price}</p>
-              </Link>
+
+                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 absolute top-2 right-12">
+                  Out of Stock
+                </div>
+              </div>
             ))}
           </div>
         ) : (

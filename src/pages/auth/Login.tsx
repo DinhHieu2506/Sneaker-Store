@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../../zustand/auth";
 import EyeIcon from "../../components/ui/icon/eye";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 export default function Login() {
   const { login, loading, error } = useAuthStore();
   const navigate = useNavigate();
@@ -13,21 +13,20 @@ export default function Login() {
 
   const inputClass =
     "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
-    if (!error) {
-      toast.success("Wellcome back!");
+    const success = await login(email, password);
+
+    if (success) {
+      toast.success("Welcome back!");
       navigate("/");
     } else {
-      toast.error(error);
+      toast.error(error || "Invalid email or password");
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-screen">
-      <Toaster position="top-right" />
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md">
         <div className="flex flex-col space-y-1.5 p-6 text-center">
           <div className="font-semibold tracking-tight text-2xl">
