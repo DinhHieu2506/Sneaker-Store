@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useProductsStore } from "../../zustand/products";
 import ProductCard from "../../components/ProductCard";
+import { Link } from "react-router-dom";
 
 export default function Feature() {
   const {
@@ -54,12 +55,12 @@ export default function Feature() {
           </div>
         )}
         <div className="text-center mt-12">
-          <a
+          <Link
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 rounded-md px-8"
-            href="/products?featured=true"
+            to="/products?featured=true"
           >
             View All Featured
-          </a>
+          </Link>
         </div>
       </div>
     </section>
